@@ -14,32 +14,38 @@
 <link rel="StyleSheet"
 	href="${pageContext.request.contextPath}/res/mc.css" type="text/css"
 	title="cse4413" media="screen, print" />
+	
+<script type="text/javascript" src="${pageContext.request.contextPath}/res/mc.js">;</script>
 <title>Insert title here</title>
 </head>
 
 <body>
-	<form action="Osap" method="POST" class="osapForm">
+	<form action="Osap" method="POST" class="osapForm" onsubmit="return validate();">
 		<legend> ${APPNAME} </legend><BR /><BR />
 		
 		<label  class="error"> ${errorMessage} </label><BR />
 		
-		<label for="principal"> Principal <BR /> <small>(total loan amount after studies)</small></label> 
+		<label for="principal"> Principal <SPAN id="principal-error" style="display: none">*</SPAN> <BR /> <small>(total loan amount after studies)</small></label> 
 		<input type="number" step="0.01" id="principal" name="principal"></input> <br/>
 		
-		<label for="interest"> Annual Interest </label> 
+		<label for="interest"> Annual Interest <SPAN id="interest-error" style="display: none">*</SPAN> </label> 
 		<input type="number" step="0.01" id="interest" name="interest"></input> <br/>
 		
-		<label for="period"> Payment Period <BR /> <small>(total number of months)</small></label> 
+		<label for="period"> Payment Period <SPAN id="period-error" style="display: none">*</SPAN> <BR /> <small>(total number of months)</small></label> 
 		<input type="number" step="0.01" id="period" name="period"></input> <br/>
 		
 		<label for="grace"> Grace Period <BR /> <small>(Take advantage of 6 month grace period and include grace period interest with your loan balance)</small></label> 
 		<input type="checkbox" name="inputGrace"></input><br/>
 		
 		<button action="submit" name="calculate" value="true">Submit</button>
+		<button name="ajax" value="true"
+				onclick="validate(); doSimpleAjax('/OsapCalc-v4/Osap/Ajax/');return false;">
+				Submit (Ajax)</button>
 	</form>
 	
 	<BR /><BR />
-	<legend>This is lab 4 </legend>
+	<div id="result"></div>
+
 </body>
 </html>
 </jsp:root>
