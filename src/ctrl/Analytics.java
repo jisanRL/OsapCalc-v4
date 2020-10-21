@@ -1,6 +1,8 @@
 package ctrl;
 
 import java.io.IOException;
+
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -22,6 +24,11 @@ public class Analytics extends HttpServlet {
         super();
         // TODO Auto-generated constructor stub
     }
+    
+    @Override
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+    }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -29,6 +36,7 @@ public class Analytics extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
+		request.getRequestDispatcher("/MaxPrincipal.jspx").forward(request, response);
 	}
 
 	/**

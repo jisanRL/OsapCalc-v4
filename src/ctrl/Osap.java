@@ -67,7 +67,7 @@ public class Osap extends HttpServlet {
 		String period = request.getParameter("period"); 				// grace period
 		
 		
-		if (request.getParameter("calculate") == null || 
+		if (request.getParameter("calculate") == null && !(request.getRequestURI().equals("/OsapCalc-v4/Osap/Ajax/")) || 
 				Double.parseDouble(principal) < 0 || Double.parseDouble(userInterest) < 0 || Double.parseDouble(period) < 0 ||
 				(request.getParameter("restart") != null && request.getParameter("restart").equals("true"))){
 
@@ -75,7 +75,7 @@ public class Osap extends HttpServlet {
 			request.getRequestDispatcher("/UI.jspx").forward(request, response);  // send to UI page 
 			request.getSession().setAttribute("errorMessage","hello");
 
-		} else if (request.getParameter("calculate") == null || 
+		} else if (request.getParameter("calculate") == null && !(request.getRequestURI().equals("/OsapCalc-v4/Osap/Ajax/")) ||
 				Double.parseDouble(principal) > 0 || Double.parseDouble(userInterest) > 0 || Double.parseDouble(period) > 0) {
 			
 			response.getWriter().append("Served at: ").append(request.getContextPath());
@@ -109,6 +109,7 @@ public class Osap extends HttpServlet {
 					userInterest = userInterest; 
 				}
 			
+				// fix this part, try to put them in one try catch 
 				try {
 					if (request.getParameter("inputGrace") == null) {
 						graceInterest  = 0;
@@ -160,7 +161,43 @@ public class Osap extends HttpServlet {
 			session.getServletContext().setAttribute("PAY", payment);
 			
 			request.getRequestDispatcher("/Results.jspx").forward(request, response);		// send to results page 
-		
+	
+		} else if(request.getParameter("ajax") != null) {
+			setErrorResponse(request);
+//			request.getRequestDispatcher("/UI.jspx").forward(request, response);  // send to UI page 
+			request.getSession().setAttribute("errorMessage","hello");
+		} else if (request.getParameter("ajax") != null && 
+				(Double.parseDouble(principal) > 0 || Double.parseDouble(userInterest) > 0 || Double.parseDouble(period) > 0)) {
+			try {
+				if (request.getParameter("inputGrace") == null) {
+					graceInterest  = 0;
+				} else {
+					graceInterest = ln.computeGraceInterest(principal, gracePeriod, userInterest, fixed_interest);
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			try {
+				if (request.getParameter("inputGrace") != null) {
+					payment = ln.computePayment(principal, userInterest, userInterest, period, gracePeriod, fixed_interest) + 
+							((graceInterest) / Double.parseDouble(gracePeriod));
+				} else {
+					payment = ln.computePayment(principal, userInterest, userInterest, period, gracePeriod, fixed_interest);
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			request.setAttribute("GI", graceInterest);
+			request.getSession().setAttribute("GI", graceInterest);
+			
+			request.setAttribute("PAY", payment);
+			request.getSession().setAttribute("PAY", payment);
+			
+			response.getWriter().write("Grace Period Interest: " + request.getAttribute("GI") + "\n"
+					+ "Monthly Payment: " + request.getAttribute("PAY"));
 		} else {
 			
 		}

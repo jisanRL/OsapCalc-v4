@@ -11,7 +11,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-<p>Max Principal: </p>
+<p>Max Principal: ${maxPrincipal} </p>
 </body>
 </html>
 </jsp:root>

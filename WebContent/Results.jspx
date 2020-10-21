@@ -18,7 +18,7 @@
 </head>
 
 <body>
-	<form action="Osap" method="POST">
+	<form action="Osap" method="POST" class="resultForm">
 		<legend>${APPNAME}</legend><BR /><BR />
 		<f:formatNumber type="currency" maxFractionDigits="2">
 			<strong>Grace Period Interest: </strong> ${GI} <br/> <br/>
