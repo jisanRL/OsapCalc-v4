@@ -52,6 +52,12 @@ public class Loan {
 //		
 //	}
 	
+	
+	public void interestHandler(String principal, String userInterest, String period, boolean inputGrace) {
+		
+	}
+	
+	
 	public double computePayment(String p, String a, String i, String g, String gp, String fi) throws Exception {
 		principal = Double.parseDouble(p);
 		userInterest = Double.parseDouble(i);

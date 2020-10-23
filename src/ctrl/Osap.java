@@ -48,7 +48,30 @@ public class Osap extends HttpServlet {
 		context.setAttribute("mLoan", new Loan());
 	}
     
-    
+  private void graceInterestHandler(HttpServletRequest request) throws Exception {
+	  	String principal = request.getParameter("principal");
+		String userInterest = request.getParameter("interest");
+		String period = request.getParameter("period"); 
+		
+		if (request.getParameter("inputGrace") == null) {
+			graceInterest = 0;
+		} else {
+			graceInterest = ln.computeGraceInterest(principal, gracePeriod, userInterest, default_interest);
+		}
+  }
+  
+	private void monthlyPaymentHandler(HttpServletRequest request) throws NumberFormatException, Exception {
+		String principal = request.getParameter("principal");
+		String userInterest = request.getParameter("interest");
+		String period = request.getParameter("period");
+		if (request.getParameter("inputGrace") != null) {
+			payment = ln.computePayment(principal, userInterest, userInterest, period, gracePeriod, default_interest)
+					+ ((graceInterest) / Double.parseDouble(gracePeriod));
+		} else {
+			payment = ln.computePayment(principal, userInterest, userInterest, period, gracePeriod, default_interest);
+		}
+	}
+
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -74,48 +97,33 @@ public class Osap extends HttpServlet {
 			userInterest = userInterest;
 		}
 		
-		try {
-			if (request.getParameter("inputGrace") == null) {
-				graceInterest  = 0.0;
-			} else {
-				graceInterest = ln.computeGraceInterest(principal, gracePeriod, userInterest, default_interest);
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
-		try {
-			if (request.getParameter("inputGrace") != null) {
-				payment = ln.computePayment(principal, userInterest, userInterest, period, gracePeriod, default_interest) + 
-						((graceInterest) / Double.parseDouble(gracePeriod));
-			} else {
-				payment = ln.computePayment(principal, userInterest, userInterest, period, gracePeriod, default_interest);
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		request.getServletContext().setAttribute("GI", graceInterest);
-		request.getSession().setAttribute("GI", graceInterest);
-		
-		request.getServletContext().setAttribute("PAY", payment);
-		request.getSession().setAttribute("PAY", payment);
-		
-		
-		// synchronous buttons
+		// synchronous buttons, think about !(request.getRequestURI().equals("/OsapCalc-v4/Osap/Ajax/") -> THIS IS PROBLEM
 		if (request.getParameter("calculate") == null &&  !(request.getRequestURI().equals("/OsapCalc-v4/Osap/Ajax/")) ||
 				(request.getParameter("restart") != null && request.getParameter("restart").equals("true"))){			
 			setErrorResponse(request);
 			request.getRequestDispatcher("/UI.jspx").forward(request, response);  // send to UI page 
 			request.getSession().setAttribute("errorMessage","hello");
 
-		} else if (request.getParameter("calculate") == null || request.getParameter("ajax") !=  null) { 				
+		} else if (request.getParameter("calculate") != null 
+				&& !(request.getRequestURI().equals("/OsapCalc-v4/Osap/Ajax/"))) { 				
 			response.getWriter().append("Served at: ").append(request.getContextPath());
 			response.setContentType("text/plain");
 			Writer resOut = response.getWriter();
 			
+			try {
+				graceInterestHandler(request);		// grace interest
+				monthlyPaymentHandler(request);		// monthly request
+			} catch (NumberFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}		
+			
+			request.setAttribute("GI", graceInterest);
+			request.setAttribute("PAY", String.format("%.2f", payment));
 		
 			// task E : save session, how do you get the data from servlet into the results page
 			HttpSession session = request.getSession();
@@ -154,9 +162,25 @@ public class Osap extends HttpServlet {
 		} 
 		else if (request.getParameter("ajax") == null) {
 			
+			try {
+				graceInterestHandler(request);		// grace interest
+				monthlyPaymentHandler(request);		// monthly request
+			} catch (NumberFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}		
 			
-			response.getWriter().write("Grace Period Interest: " + graceInterest + "</br>" + "Monthly Payments: " + String.format("%.2f",payment));
+			request.setAttribute("GI", graceInterest);
+			request.setAttribute("PAY", String.format("%.2f", payment));
+//			request.setAttribute("GI", graceInterest);
+//			request.setAttribute("PAY", String.format("%.2f", payment));
+			response.getWriter().write("Grace Period Interest: " + request.getAttribute("GI") + "</br>" + "Monthly Payments: " + request.getAttribute("PAY"));
 			response.getWriter().write(" ");
+			
+			
 			System.out.println("submit clicked");
 			System.out.println("ajax clicked");
 			System.out.println("-----------------graceInterestHandler------------------------");
