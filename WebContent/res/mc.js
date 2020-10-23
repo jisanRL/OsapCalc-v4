@@ -69,11 +69,12 @@ function doSimpleAjax(address) {
 	request.onreadystatechange = function() {
 		handler(request)
 		};
-		request.send(null);
-		}
+		request.send();
+	}
 		
 
 function handler(request) {
+	
 	if ((request.readyState == 4) && (request.status == 200)) {
 		var target = document.getElementById("result");
 		target.innerHTML = request.responseText;

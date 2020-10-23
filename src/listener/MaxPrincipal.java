@@ -1,8 +1,11 @@
 package listener;
 
+import javax.servlet.ServletRequestAttributeEvent;
+
 import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionBindingEvent;
+
 
 /**
  * Application Lifecycle Listener implementation class MaxPrincip
@@ -27,12 +30,8 @@ public class MaxPrincipal implements HttpSessionAttributeListener {
      */
     public void attributeAdded(HttpSessionBindingEvent event)  { 
          // TODO Auto-generated method stub
-    	if (event.equals("principal")) {
-    		double principal = Double.parseDouble(event.getValue().toString());
-			
-			if (principal > maxPrincipal) {
-				this.maxPrincipal = principal;
-			}
+    	if (event.getName().equals("principal")) {
+			 handleEvent(event);
 		}
     }
 
@@ -49,13 +48,16 @@ public class MaxPrincipal implements HttpSessionAttributeListener {
     public void attributeReplaced(HttpSessionBindingEvent event)  { 
          // TODO Auto-generated method stub
     	if (event.getName().equals("principal")) {
-    		double principal = Double.parseDouble(event.getValue().toString());
-    		
-    		if (principal > maxPrincipal) {
-				this.maxPrincipal = principal;
-			}
-//			handleEvent(arg0);
+			 handleEvent(event);
 		}
     }
-	
+    
+    public void handleEvent(HttpSessionBindingEvent event) {
+		double princip = Double.parseDouble(event.getValue().toString());  // gets the principal input from UI.jspx
+		
+		if (princip > maxPrincipal) {
+			maxPrincipal = princip;
+		}
+//		event.getSession().getServletContext().setAttribute("maxPrincipal", maxPrincipal);
+	}	
 }

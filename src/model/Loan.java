@@ -18,6 +18,8 @@ public class Loan {
 	private double interest = userInterest + fixedInterest;
 	public double graceInterest;
 	public double monthlyPayment;
+	private String gracePeriodUsed;
+	private double totalInterest;
 	
 	
 	public Loan() {
@@ -25,6 +27,30 @@ public class Loan {
 		this.userInterest = 0.0;
 		this.period = 0.0;
 	}
+	
+//	public Loan(Double principal, Double interest, Double period, Double fixedInterest, Integer gracePeriod, String gracePeriodUsed) {
+//		this.principal = principal;
+//		this.interest = interest;
+//		this.period = period;
+//		this.gracePeriodUsed = gracePeriodUsed;
+//
+//		
+//		if (gracePeriodUsed.equals("false") || gracePeriodUsed.equals("")) {
+//			this.totalInterest = this.fixedInterest;
+//		} else {
+//			this.totalInterest = this.fixedInterest +this.interest;
+//		}
+//	}
+	
+//	public double graceInterestHandler(String inputGrace) {
+//		this.gracePeriod = 
+//				Double.parseDouble(inputGrace);
+//		
+//	}
+	
+//	public double monthlyPaymentHandler() {
+//		
+//	}
 	
 	public double computePayment(String p, String a, String i, String g, String gp, String fi) throws Exception {
 		principal = Double.parseDouble(p);
